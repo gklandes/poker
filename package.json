@@ -1,0 +1,17 @@
+{
+  "name": "poker",
+  "version": "0.0.0",
+  "description": "an sse based scrum poker game",
+  "repository": "",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "css": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Gabriel Landes",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+  }
+}
