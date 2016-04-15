@@ -22,15 +22,21 @@
 
         <div class="wrapper container" ng-controller="appCtrl as vm">
             <h1>Scrum Poker {{ vm.version }}</h1>
-            <button class="btn btn-primary" ng-click="vm.createGame()">New Game</button>
+            <form name="newGameForm">
+                <input name="name" ng-model="vm.newgame.name" placeholder="Name"> 
+                <button class="btn btn-primary" ng-click="vm.createGame()" ng-disabled="vm.saving">New Game</button>
+            </form>
             <h2>Active Games</h2>
             <ul>
-                <li ng-repeat="game in vm.games">{{ game }}</li>
+                <li ng-repeat="game in vm.games">{{ game.name }}</li>
             </ul>
         </div>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-resource.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.18/angular-ui-router.min.js"></script>
+        <script src='https://cdn.firebase.com/js/client/2.2.4/firebase.js'></script>
         <script src="js/app.js"></script>
     </body>
 </html>

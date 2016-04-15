@@ -1,20 +1,44 @@
 (function () {
+    'use strict';
     angular
-        .module('poker',['ui.router'])
+        .module('poker',['ngResource','ui.router'])
+        .constant('CONSTANTS', {
+            firebaseUri: 'https://blazing-inferno-4663.firebaseio.com/'
+        })
         .controller('appCtrl', appCtrl)
         ;
 
-    appCtrl.$inject = [];
-    function appCtrl () {
+    appCtrl.$inject = ['$resource', 'CONSTANTS'];
+    function appCtrl ($resource, CONSTANTS) {
         var vm = this;
+        var gamesResource = $resource(CONSTANTS.firebaseUri + 'games.json');
         vm.version = '1.0';
-        vm.createGame = createGame;
-        vm.games = [];
+        vm.createGame = _.debounce(createGame,500);
+        // vm.games = gamesResource.get();
 
+        getGames();
+
+        return;
+
+        function getGames () {
+            gamesResource.get({},
+                function (success) { 
+                    console.log(success);
+                    vm.games = success;
+                },
+                console.warn
+            );
+        }
         function createGame () {
-            console.log('new game');
-            var c = vm.games.length + 1;
-            vm.games.push('game ' + c);
+            vm.saving = true;
+            gamesResource.save(vm.newgame,
+                function (success) {
+                    vm.saving = false;
+                    getGames();
+                    vm.newgame.name = undefined;
+                },
+                console.warn
+            );
         }
     }
 })();
