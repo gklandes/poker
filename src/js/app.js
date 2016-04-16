@@ -16,10 +16,17 @@
         vm.createGame = _.debounce(createGame,500);
         // vm.games = gamesResource.get();
 
+        setupSSE();
         getGames();
 
         return;
 
+        function setupSSE () {
+            var es = new EventSource("//localhost:4568/sse");
+            es.onmessage = function (event) {
+              console.log(event.data);
+            };
+        }
         function getGames () {
             gamesResource.get({},
                 function (success) { 
