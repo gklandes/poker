@@ -11,9 +11,10 @@
     appCtrl.$inject = ['$resource', 'CONSTANTS'];
     function appCtrl ($resource, CONSTANTS) {
         var vm = this;
-        var gamesResource = $resource(CONSTANTS.firebaseUri + 'games.json');
+        var gamesResource = $resource('/api/games/:id',{ id: '@id'});
         vm.version = '1.0';
         vm.createGame = _.debounce(createGame,500);
+        vm.deleteGame = _.debounce(deleteGame,500);
         // vm.games = gamesResource.get();
 
         setupSSE();
@@ -22,13 +23,13 @@
         return;
 
         function setupSSE () {
-            var es = new EventSource("//localhost:4568/sse");
+            var es = new EventSource("/sse");
             es.onmessage = function (event) {
-              console.log(event.data);
+              console.log(event);
             };
         }
         function getGames () {
-            gamesResource.get({},
+            gamesResource.query({},
                 function (success) { 
                     console.log(success);
                     vm.games = success;
@@ -45,6 +46,16 @@
                     vm.newgame.name = undefined;
                 },
                 console.warn
+            );
+        }
+        function deleteGame (id) {
+            gamesResource.delete({id: id},
+                function (success) {
+                    getGames();
+                },
+                function (error) {
+                    alert(error.data);
+                }
             );
         }
     }
