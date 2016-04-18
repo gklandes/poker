@@ -1,11 +1,14 @@
 var express = require('express');
 var router = express.Router();
+var bodyParser = require('body-parser');
 var appData = { 
     games: [{ id: 1, name: 'one' }, { id: 2, name: 'two' }]
 };
 
 module.exports = router;
 
+router.use(bodyParser.urlencoded({ extended: true }));
+router.use(bodyParser.json());
 router.route('/games(/:id)?')
     .get(function (req, res) {
         if (!req.params.id) {
@@ -33,7 +36,7 @@ router.route('/games(/:id)?')
             var newGame = {id: appData.games.length + 1, name: req.body.name };
             appData.games.push(newGame);
             res.json(newGame);
-            sse.send({ type: 'game', action: 'new', data: newGame});
+            req.app.locals.sse.send({ type: 'game', action: 'new', data: newGame});
         } else {
             res.writeHead(400, 'Bad Request', {'Content-Type': 'text/plain'});
             res.end('"Name" is a required field.');
@@ -62,7 +65,7 @@ router.route('/games(/:id)?')
         }
         if (req.body.name) {
             newGame.name = req.body.name;
-            sse.send({ type: 'game', action: 'update', data: newGame});
+            req.app.locals.sse.send({ type: 'game', action: 'update', data: newGame});
             res.json(newGame);
         } else {
             res.writeHead(400, 'Bad Request', {'Content-Type': 'text/plain'});
@@ -81,7 +84,7 @@ router.route('/games(/:id)?')
             if (appData.games[i].id == id) {
                 appData.games.splice(i,1);
                 found = true;
-                sse.send({ type: 'game', action: 'delete', data: null });
+                req.app.locals.sse.send({ type: 'game', action: 'delete', data: null });
                 res.writeHead(204, 'No Content', {'Content-Type': 'text/plain'});
                 res.end('Deleted');
                 break;
