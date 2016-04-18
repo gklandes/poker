@@ -29,16 +29,14 @@
                 switch (data.type) {
                     case 'game' : getGames(); break;
                 }
-                console.log(JSON.parse(event.data));
             };
         }
         function getGames () {
             gamesResource.query({},
                 function (success) { 
-                    console.log(success);
                     vm.games = success;
                 },
-                console.warn
+                alertError
             );
         }
         function createGame () {
@@ -49,7 +47,7 @@
                     getGames();
                     vm.newgame.name = undefined;
                 },
-                console.warn
+                alertError
             );
         }
         function deleteGame (id) {
@@ -57,10 +55,11 @@
                 function (success) {
                     getGames();
                 },
-                function (error) {
-                    alert(error.data);
-                }
+                alertError
             );
+        }
+        function alertError (error) {
+            alert(error.data);
         }
     }
 })();
