@@ -16,6 +16,7 @@
     "body-parser": "^1.15.0",
     "express": "^4.13.4",
     "express-sse": "^0.2.1",
+    "require-dir": "^0.3.0",
     "sse": "0.0.6"
   },
   "devDependencies": {}
