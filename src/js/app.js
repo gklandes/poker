@@ -23,9 +23,13 @@
         return;
 
         function setupSSE () {
-            var es = new EventSource("/sse");
+            var data, es = new EventSource("/sse");
             es.onmessage = function (event) {
-              console.log(event);
+                data = JSON.parse(event.data);
+                switch (data.type) {
+                    case 'game' : getGames(); break;
+                }
+                console.log(JSON.parse(event.data));
             };
         }
         function getGames () {
