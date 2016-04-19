@@ -2,14 +2,11 @@
     'use strict';
     angular
         .module('poker',['ngResource','ui.router'])
-        .constant('CONSTANTS', {
-            firebaseUri: 'https://blazing-inferno-4663.firebaseio.com/'
-        })
         .controller('appCtrl', appCtrl)
         ;
 
-    appCtrl.$inject = ['$resource', 'CONSTANTS'];
-    function appCtrl ($resource, CONSTANTS) {
+    appCtrl.$inject = ['$resource'];
+    function appCtrl ($resource) {
         var vm = this;
         var gamesResource = $resource('/api/games/:id',{ id: '@id'});
         vm.version = '1.0';

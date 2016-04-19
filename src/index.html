@@ -28,7 +28,7 @@
             </form>
             <h2>Active Games</h2>
             <ul class="list-unstyled">
-                <li ng-repeat="game in vm.games"><i class="fa fa-times" ng-click="vm.deleteGame(game.id)"></i> {{ game.name }}</li>
+                <li ng-repeat="game in vm.games"><i class="fa fa-times" ng-click="vm.deleteGame(game._id)"></i> {{ game.name }}</li>
             </ul>
         </div>
 

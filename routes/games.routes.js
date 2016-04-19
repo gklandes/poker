@@ -1,9 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
-var appData = { 
-    games: [{ id: 1, name: 'one' }, { id: 2, name: 'two' }]
-};
+var Game = require('../models/game.model');
 
 module.exports = router;
 
@@ -13,86 +11,52 @@ router.route('/games(/:id)?')
     .get(function (req, res) {
         if (!req.params.id) {
             console.log('get all');
-            res.json(appData.games);
+            Game.find(function(err, games) {
+                if (err) res.send(err);
+                res.json(games);
+            });
         } else {
-            var found = false;
-            console.log('get');
-            for (var i in appData.games) {
-                if (appData.games[i].id == req.params.id) {
-                    res.json(appData.games[i]);
-                    found = true;
-                    break;
+            console.log('get', req.params.id);
+            Game.findById(req.params.id, function(err, game) {
+                if (err) res.status(500).send(err);
+                else{
+                    if (game) res.send(game);
+                    else res.status(404).end('Not Found');
                 }
-            }
-            if (!found) {
-                res.writeHead(404, 'Not Found', {'Content-Type': 'text/plain'});
-                res.end('Not Found');
-            }
+            });
         }
     })
     .post(function (req, res) {
         console.log('post', req.body);
-        if (req.body.name) {
-            var newGame = {id: appData.games.length + 1, name: req.body.name };
-            appData.games.push(newGame);
-            res.json(newGame);
-            req.app.locals.sse.send({ type: 'game', action: 'new', data: newGame});
-        } else {
-            res.writeHead(400, 'Bad Request', {'Content-Type': 'text/plain'});
-            res.end('"Name" is a required field.');
-        }
+        var game = new Game();
+        game.name = req.body.name;
+        game.save(function(err) {
+            if (err) res.status(500).send(err);
+            else res.send(req.body);
+        });
     })
     .put(function(req, res) {
-        console.log('put', req.params, req.body);
-        var newGame, id = req.params.id;
-        var found = false;
-        if (!id){
-            res.writeHead(405, 'Method Not Allowed', {'Content-Type': 'text/plain'});
-            res.end('Method Not Allowed');
-            return;
-        }
-        for (var i in appData.games) {
-            if (appData.games[i].id == id) {
-                newGame = appData.games[i];
-                found = true;
-                break;
+        console.log('put', req.params.id, req.body);
+        Game.findById(req.params.id, function(err, game) {
+            if (err) res.status(500).send(err);
+            else if (!game) res.status(404).end('Not Found');
+            else {
+                game.name = req.body.name;
+                game.save(function(err) {
+                    if (err) res.status(500).send(err);
+                    res.send(game);
+                });
             }
-        }
-        if (!found) {
-            res.writeHead(404, 'Not Found', {'Content-Type': 'text/plain'});
-            res.end('Not Found');
-            return;
-        }
-        if (req.body.name) {
-            newGame.name = req.body.name;
-            req.app.locals.sse.send({ type: 'game', action: 'update', data: newGame});
-            res.json(newGame);
-        } else {
-            res.writeHead(400, 'Bad Request', {'Content-Type': 'text/plain'});
-            res.end('"Name" is a required field.');
-        }
+        });
     })
     .delete(function (req, res) {
-        console.log('delete', req.params);
-        var id = req.params.id;
-        if (!id){
-            res.writeHead(405, 'Method Not Allowed', {'Content-Type': 'text/plain'});
-            res.end('Method Not Allowed');
-            return;
-        }
-        for (var i in appData.games) {
-            if (appData.games[i].id == id) {
-                appData.games.splice(i,1);
-                found = true;
-                req.app.locals.sse.send({ type: 'game', action: 'delete', data: null });
-                res.writeHead(204, 'No Content', {'Content-Type': 'text/plain'});
-                res.end('Deleted');
-                break;
-            }
-        }
-        if (!found) {
-            res.writeHead(404, 'Not Found', {'Content-Type': 'text/plain'});
-            res.end('Not Found');
-        }
+        console.log('delete', req.params.id);
+        Game.remove({
+            _id: req.params.id
+        }, function(err, game) {
+            if (err) res.status(500).send(err);
+            else if (!game) res.status(404).end('Not Found');
+            else res.status(204).end('No Content');
+        });
     })
     ;
