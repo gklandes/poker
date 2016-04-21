@@ -11,9 +11,17 @@ So, why does the world need another scrum poker tool. Well, it doesn't. I just w
 
 *Screens*
 * home
-  * select an ongoing game - open bidding screen
-  * start a game - add game to list (by username); open bidding screen
+  * login - use email
+  * start a game
+  * join a game
 * bidding 
-  * select a value
-  * view bids
-  * clear bids (owner)
+  * (re)select a bid
+  * start a hand (owner) - set title; start
+  * view bidding users - watch incoming bids by user; values hidden
+  * "call" a hand (owner) -  freeze a hand; revealing bids
+  * close a hand (owner) - record bid (must be unanimous); clear bidding screen
+  * end game
+  * show results
+* results
+  * list 'hands' with bids
+  * total
