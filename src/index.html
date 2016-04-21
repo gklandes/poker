@@ -20,23 +20,22 @@
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
 
-        <div class="wrapper container" ng-controller="appCtrl as vm" ng-cloak>
-            <h1>Scrum Poker {{ vm.version }}</h1>
-            <form name="newGameForm">
-                <input name="name" ng-model="vm.newgame.name" placeholder="Name"> 
-                <button class="btn btn-primary" ng-click="vm.createGame()" ng-disabled="vm.saving">New Game</button>
-            </form>
-            <h2>Active Games</h2>
-            <ul class="list-unstyled">
-                <li ng-repeat="game in vm.games"><i class="fa fa-times" ng-click="vm.deleteGame(game._id)"></i> {{ game.name }}</li>
-            </ul>
+        <div ng-controller="AppCtrl as app" ng-cloak>
+            <nav class="navbar navbar-inverse navbar-default navbar-fixed-top">
+                <div class="container">
+                    <div class="navbar-header">
+                        <a class="navbar-brand" href="">Agile Poker {{app.version}}</a>
+                    </div>
+                </div>
+            </nav>
+            <div class="container" ui-view>
+            </div>
         </div>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-resource.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.18/angular-ui-router.min.js"></script>
-        <script src='https://cdn.firebase.com/js/client/2.2.4/firebase.js'></script>
         <script src="js/app.js"></script>
     </body>
 </html>

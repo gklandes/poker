@@ -2,17 +2,54 @@
     'use strict';
     angular
         .module('poker',['ngResource','ui.router'])
-        .controller('appCtrl', appCtrl)
+        .config(stateConfig)
+        .controller('AppCtrl', AppCtrl)
+        .controller('LoginCtrl', LoginCtrl)
+        .controller('HomeCtrl', HomeCtrl)
         ;
 
-    appCtrl.$inject = ['$resource'];
-    function appCtrl ($resource) {
+    stateConfig.$inject = ['$stateProvider', '$urlRouterProvider'];
+    function stateConfig ($stateProvider, $urlRouterProvider) {
+            $urlRouterProvider.otherwise("/");
+
+            $stateProvider.state('login', {
+                url: '/',
+                templateUrl: '/partials/login.html',
+                controller: 'LoginCtrl',
+                controllerAs: 'vm'
+            });
+            $stateProvider.state('home', {
+                url: '/home',
+                templateUrl: '/partials/home.html',
+                controller: 'HomeCtrl',
+                controllerAs: 'vm'
+            });
+    }
+
+    AppCtrl.$inject = [];
+    function AppCtrl () {
+        var app = this;
+        app.version = '1.0';
+    }
+
+    LoginCtrl.$inject = ['$state'];
+    function LoginCtrl ($state) {
+        var vm = this;
+        vm.login = {};
+        vm.doLogin = doLogin;
+
+        function doLogin () {
+            if (vm.login.password !== 'password') $state.go('home');
+            else alert('Seriously, ANY OTHER password is acceptable ... try again');
+        }
+    }
+
+    HomeCtrl.$inject = ['$resource'];
+    function HomeCtrl ($resource) {
         var vm = this;
         var gamesResource = $resource('/api/games/:id',{ id: '@id'});
-        vm.version = '1.0';
         vm.createGame = _.debounce(createGame,500);
         vm.deleteGame = _.debounce(deleteGame,500);
-        // vm.games = gamesResource.get();
 
         setupSSE();
         getGames();

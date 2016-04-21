@@ -1,0 +1,7 @@
+<form name="newGameForm">
+    <button class="btn btn-primary" ng-click="vm.createGame()" ng-disabled="vm.saving">New Game</button>
+</form>
+<h2>Active Games</h2>
+<ul class="list-unstyled">
+    <li ng-repeat="game in vm.games"><i class="fa fa-times" ng-click="vm.deleteGame(game._id)"></i> {{ game.name }}</li>
+</ul>
