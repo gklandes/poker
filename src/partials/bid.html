@@ -1,0 +1,10 @@
+<div>
+    <h3>{{ vm.hand.issue}}</h3>
+</div>
+
+<div class="bid-options">
+    <span ng-repeat="bid in vm.options">
+        <span ng-if="bid.string"><i class="fa fa-{{bid.value}}"></i></span>
+        <span ng-if="!bid.string">{{bid.value}}</span>
+    </span>
+</div>

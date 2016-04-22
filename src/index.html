@@ -6,7 +6,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>Scrum Poker</title>
+        <title>Agile Poker</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -24,12 +24,11 @@
             <nav class="navbar navbar-inverse navbar-default navbar-fixed-top">
                 <div class="container">
                     <div class="navbar-header">
-                        <a class="navbar-brand" href="">Agile Poker {{app.version}}</a>
+                        <a class="navbar-brand" ui-sref="home">Agile Poker {{app.version}}</a>
                     </div>
                 </div>
             </nav>
-            <div class="container" ui-view>
-            </div>
+            <div class="container" ui-view></div>
         </div>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
