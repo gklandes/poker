@@ -1,0 +1,19 @@
+{
+  // ENFORCING OPTIONS
+  "eqeqeq": true,
+  "nocomma": true,
+  "undef": true,
+  "unused": true,
+
+  // RELAXING OPTIONS
+
+  // ENVIRONMENTS
+  "browser": true,
+  "globals": {
+    // true = writeable, false = readonly
+    "angular": false,
+    "_": false,
+    "EventSource": false,
+    "require": false
+  }
+}

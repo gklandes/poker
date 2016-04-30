@@ -1,0 +1,13 @@
+{
+    // ENFORCING OPTIONS
+    "eqeqeq": true,
+    "nocomma": true,
+    "undef": true,
+    "unused": true,
+    "strict": false,
+
+    // RELAXING OPTIONS
+
+    // ENVIRONMENTS
+    "node": true
+}
