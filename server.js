@@ -6,10 +6,8 @@ var mongoose   = require('mongoose');
 mongoose.connect('mongodb://localhost:27017/poker'); // connect to our database
 
 var app = express();
-var router = express.Router();
 var appPort = process.argv[2] || 8080;
 app.locals.sse = new SSE(['SSE connected']);
-
 
 // start the app
 app.listen(appPort, function () {
