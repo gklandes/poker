@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "an sse based scrum poker game",
   "repository": "https://github.com/gklandes/poker",
-  "main": "index.js",
+  "main": "server.js",
   "directories": {
     "test": "test"
   },
