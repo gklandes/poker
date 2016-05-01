@@ -2,7 +2,8 @@
     'use strict';
 
     angular
-        .module('poker',['ngResource','ui.router'])
+        .module('poker',['ngResource','ui.router','ui.bootstrap'])
+        .service('gamesResource',gamesResource)
         .controller('AppCtrl', AppCtrl)
         .controller('LoginCtrl', LoginCtrl)
         .controller('HomeCtrl', HomeCtrl)
@@ -11,6 +12,9 @@
         .directive('pkFocus', pkFocus)
         ;
 
+    gamesResource.$inject = ['$resource'];
+    function gamesResource ($resource) {
+        return $resource('/api/games/:id',{ id: '@id' });
     }
 
     AppCtrl.$inject = [];
@@ -31,29 +35,22 @@
         }
     }
 
-    HomeCtrl.$inject = ['$scope','$resource', '$state'];
-    function HomeCtrl ($scope, $resource, $state) {
+    HomeCtrl.$inject = ['$scope','$resource', '$timeout', '$state','gamesResource'];
+    function HomeCtrl ($scope, $resource, $timeout, $state, gamesResource) {
         var vm = this;
-        var gamesResource = $resource('/api/games/:id',{ id: '@id'});
+        var undo = {};
         vm.action = null;
         vm.games = [];
 
-        vm.go = go;
-        // vm.createGame = _.debounce(createGame,500);
-        // vm.deleteGame = _.debounce(deleteGame,500);
+        vm.go = _.debounce(go,500);
+        vm.deleteGame = _.debounce(deleteGame,500);
+        vm.undoDeleteGame = _.debounce(undoDeleteGame,500);
 
-        setupListeners();
-        setupSSE();
         getGames();
+        setupSSE();
 
         return;
 
-        function setupListeners () {
-            var stopWatchAction = $scope.$watch('vm.action',function (n) {
-                if (n) { $scope.$broadcast('focus',n === 'new' ? 'name' : 'join') }
-            });
-            $scope.$on('$destroy', stopWatchAction);
-        }
         function setupSSE () {
             var data, es = new EventSource("/sse");
             es.onmessage = function (event) {
@@ -63,37 +60,67 @@
                 }
             };
         }
-        function getGames () {
-            gamesResource.query({},
-                function (success) { 
+        function getGames (code) {
+            gamesResource.query({ code: code },
+                function (success) {
                     vm.games = success;
                 },
                 alertError
             );
         }
         function go (id) {
-            if (!id) id = vm.action;
-            console.log(id);
-            $state.go('game',{ id: id });
+            if (id === 'join') $state.go('join');
+            if (id) $state.go('game',{ id: id });
+            else {
+                if (vm.action === 'new') createGame();
+                else if (vm.action === 'join') {
+                    var game = _.findWhere(vm.games,{ code: vm.code});
+                    $state.go('game', { id: game._id });
+                }
+            }
         }
-        // function deleteGame (id) {
-        //     gamesResource.delete({id: id},
-        //         function (success) {
-        //             getGames();
-        //         },
-        //         alertError
-        //     );
-        // }
+        function createGame () {
+            vm.saving = true;
+            gamesResource.save(vm.newgame,
+                function (success) {
+                    $state.go('game',{ id: success._id });
+                },
+                alertError
+            );
+        }
+        function deleteGame (game) {
+            console.log('delete:',game.name);
+            $scope.$apply(function () {
+                game.deleted = true;
+                undo[game._id] = $timeout(function () {
+                    console.log('deleting:',game.name);
+                    gamesResource.delete({id: game._id},
+                        getGames,
+                        alertError
+                    );
+                },5000);
+            });
+        }
+        function undoDeleteGame (game) {
+            console.log('undo:',game.name);
+            if (undo[game._id]) {
+                $scope.$apply(function () {
+                    $timeout.cancel(undo[game._id]);
+                    game.deleted = false;
+                });
+            }
+        }
         function alertError (error) {
             alert(error.data);
         }
     }
 
-    GameCtrl.$inject = ['$stateParams'];
-    function GameCtrl ($stateParams) {
+    GameCtrl.$inject = ['$stateParams', 'gamesResource'];
+    function GameCtrl ($stateParams, gamesResource) {
         var vm = this;
         var idPtn = /[a-z0-9]{24}/i;
         vm.id = $stateParams.id;
+        vm.game = {};
 
         setupGame();
 
@@ -101,19 +128,19 @@
 
         function setupGame () {
             if (idPtn.test(vm.id)) {
-                console.log('detail view');
+                getGame();
             }
         }
-        function createGame () {
-            vm.saving = true;
-            gamesResource.save(vm.newgame,
-                function (success) {
-                    vm.saving = false;
-                    getGames();
-                    vm.newgame.name = undefined;
+        function getGame () {
+            gamesResource.get({ _id: vm.id },
+                function (success) { 
+                    vm.game = success;
                 },
                 alertError
             );
+        }
+        function alertError (error) {
+            alert(error.data);
         }
     }
 
@@ -143,7 +170,7 @@
             link: function (scope, elem, attrs) {
                 var target = elem;
 
-                if (attrs.pkFocus == 'init') {
+                if (attrs.pkFocus === 'init') {
                     $timeout(function () { 
                         target[0].focus();
                         // reassign value; fixes IE issue where cursor lands at beginning of value
@@ -151,7 +178,7 @@
                     },100);
                 }
                 scope.$on('focus', function (e, id) {
-                    if (id == attrs.id) {
+                    if (id === attrs.id) {
                         $timeout(function () { target[0].focus(); },100);
                     }
                 });

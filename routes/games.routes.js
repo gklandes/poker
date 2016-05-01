@@ -13,7 +13,7 @@ router.route('/games(/:id)?')
             console.log('get all');
             Game.find(function(err, games) {
                 if (err) res.send(err);
-                res.json(games);
+                else res.json(games);
             });
         } else {
             console.log('get', req.params.id);

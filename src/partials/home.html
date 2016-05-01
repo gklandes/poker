@@ -1,28 +1,27 @@
 <form name="homeForm" ng-submit="vm.go()">
     <div class="row">
-        <p class="col-xs-6">
-            <button class="btn btn-primary btn-block" ng-click="vm.action = 'new'" ng-disabled="vm.action">New Game</button>
-        </p>
-        <p class="col-xs-6">
-            <button class="btn btn-primary btn-block" ng-click="vm.action = 'join'" ng-disabled="vm.action">Join a Game</button>
-        </p>
-    </div></div>
-    <div class="row"><div class="col-xs-12">
-        <p class="form-group" ng-if="vm.action==='new'">
-            <input ng-model="vm.name" pk-focus name="name" class="form-control" placeholder="Enter a name for your game" required>
-        </p>
-        <p class="form-group" ng-if="vm.action==='join'">
-            <input ng-model="vm.code" pk-focus name="code" class="form-control" placeholder="Enter the code for the game to join" required>
-        </p>
-        <p class="text-right" ng-show="vm.action">
-            <a href="" ng-click="vm.action = null">cancel</a>
-            <input type="submit" class="btn btn-primary" value="Go!">
-        </p>
-    </div></div>
+        <div class="col-md-3 col-xs-12">
+            <p>
+                <a class="btn btn-primary btn-block" ui-sref="game({id:'new'})">New Game</a>
+            </p>
+        </div>
+        <div  class="col-md-9 col-xs-12 games-list">
+            <h3 class="text-muted">Games</h3>
+            <div class="row" ng-repeat="game in vm.games">
+                <div class="col-xs-2 text-center">
+                    <img ng-src="{{game.owner.gravatar}}?s=40" class="img-circle" ng-if="game.owner.gravatar" />
+                    <i class="fa fa-circle" ng-if="!game.owner.gravatar"></i>
+                </div>
+                <div class="col-xs-8">
+                    <a ui-sref="game({id:game._id})" ng-if="!game.deleted">{{game.name}}</a>
+                    <a href="" ng-click="vm.undoDeleteGame(game)" ng-if="game.deleted">undo</a>
+                </div>
+                <div class="col-xs-2 text-center">
+                    <a href="" ng-click="vm.deleteGame(game)" class="pull-right text-muted" ng-if="!game.deleted"><i class="fa fa-trash"></i></a>
+                    <a href="" ng-click="vm.undoDeleteGame(game)" class="pull-right text-muted" ng-if="game.deleted"><i class="fa fa-undo"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
 </form>
 
-<h3 class="text-muted">Previous Games</h3>
-<div class="well game" ng-repeat="game in vm.games" ng-click="vm.go(game._id)">
-    <span class="pull-right text-muted">Feb 23</span>
-    <span class="">{{game.name}}</span>
-</div>
