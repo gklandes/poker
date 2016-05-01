@@ -3,15 +3,42 @@
 
     angular
         .module('poker')
-        .config(function ($stateProvider, $urlRouterProvider) {
+        .config(stateConfig)
+        ;
 
-            $urlRouterProvider.otherwise("home");
+    stateConfig.$inject = ['$stateProvider', '$urlRouterProvider'];
+    function stateConfig ($stateProvider, $urlRouterProvider) {
+            $urlRouterProvider.otherwise("/");
 
-            $stateProvider.state('home', {
+            $stateProvider.state('login', {
                 url: '/',
-                templateUrl: '/partials/home.html',
-                controller: 'appCtrl',
+                templateUrl: '/partials/login.html',
+                controller: 'LoginCtrl',
                 controllerAs: 'vm'
             });
-        });
+            $stateProvider.state('home', {
+                url: '/home',
+                templateUrl: '/partials/home.html',
+                controller: 'HomeCtrl',
+                controllerAs: 'vm'
+            });
+            $stateProvider.state('join', {
+                url: '/join',
+                templateUrl: '/partials/join.html',
+                controller: 'JoinCtrl',
+                controllerAs: 'vm'
+            });
+            $stateProvider.state('game', {
+                url: '/game/:id',
+                templateUrl: '/partials/game.html',
+                controller: 'GameCtrl',
+                controllerAs: 'vm'
+            });
+            $stateProvider.state('bid', {
+                url: '/game/:game_id/bid',
+                templateUrl: '/partials/bid.html',
+                controller: 'BidCtrl',
+                controllerAs: 'vm'
+            });
+    }
 })();
