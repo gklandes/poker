@@ -21,6 +21,15 @@
     function AppCtrl () {
         var app = this;
         app.version = '1.0';
+        app.notification = null;
+
+        $scope.$on('notify',setNotification);
+
+        function setNotification (e, msg) {
+            console.log(msg);
+            app.notification = msg;
+            $timeout(function () { app.notification = null; }, 3000);
+        }
     }
 
     LoginCtrl.$inject = ['$state'];
