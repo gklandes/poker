@@ -14,9 +14,12 @@
   "license": "ISC",
   "dependencies": {
     "body-parser": "^1.15.0",
+    "connect-mongodb-session": "^1.1.1",
     "express": "^4.13.4",
+    "express-session": "^1.13.0",
     "express-sse": "^0.2.1",
     "gravatar": "^1.5.2",
+    "md5": "^2.1.0",
     "mongoose": "^4.4.12",
     "require-dir": "^0.3.0",
     "sse": "0.0.6"

@@ -11,13 +11,23 @@
             $urlRouterProvider.otherwise("/");
 
             $stateProvider.state('login', {
-                url: '/',
+                url: '/login/{path:.*}',
                 templateUrl: '/partials/login.html',
                 controller: 'LoginCtrl',
                 controllerAs: 'vm'
             });
+            $stateProvider.state('logout', {
+                url: '/logout',
+                template: '<div class="text-center text-muted"><i class="fa fa-spinner fa-spin"></i></div>',
+                controller: 'LogoutCtrl',
+            });
+            $stateProvider.state('loading', {
+                url: '/loading/{path:.*}',
+                template: '<div class="text-center text-muted"><i class="fa fa-spinner fa-spin"></i></div>',
+                controller: 'LoadingCtrl'
+            });
             $stateProvider.state('home', {
-                url: '/home',
+                url: '/',
                 templateUrl: '/partials/home.html',
                 controller: 'HomeCtrl',
                 controllerAs: 'vm'

@@ -11,7 +11,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-        <link rel="stylesheet" href="/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/css/bootstrap.css">
         <link rel="stylesheet" href="/css/ui-bootstrap-custom-1.3.2-csp.css">
         <link rel="stylesheet" href="/css/font-awesome.min.css">
         <link rel="stylesheet" href="/css/style.css">
@@ -25,7 +25,8 @@
             <nav class="navbar navbar-inverse navbar-default navbar-fixed-top">
                 <div class="container">
                     <div class="navbar-header">
-                        <a class="navbar-brand" ui-sref="home" ng-cloak>Agile Poker {{app.version}}</a>
+                        <a ui-sref="logout" class="btn navbar-btn navbar-inverse"><i class="fa fa-sign-out"></i></a>
+                        <a class="navbar-brand" ng-cloak>Agile Poker {{app.version}}</a>
                     </div>
                 </div>
             </nav>
