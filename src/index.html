@@ -30,7 +30,7 @@
                     </div>
                 </div>
             </nav>
-            <div class="container"><div class="alert alert-danger" ng-if="app.notification" ng-cloak>{{app.notification}}</div></div>
+            <div class="container"><div class="alert alert-danger" ng-if="app.notification" ng-cloak ng-click="app.notification = null" >{{app.notification}}</div></div>
             <div class="container" ui-view></div>
         </div>
 
