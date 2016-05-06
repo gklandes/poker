@@ -5,6 +5,7 @@ var session = require('express-session');
 var requireDir = require("require-dir");
 var mongoose   = require('mongoose');
 var MongoDBStore = require('connect-mongodb-session')(session);
+var md5 = require('md5');
 
 var mongooseUri = 'mongodb://localhost:27017/poker';
 mongoose.connect(mongooseUri); // connect to our database
@@ -22,7 +23,7 @@ app.use(session({
     saveUninitialized: false,
     secret: 'yougot2knowwhen2holdem',
     cookie: {
-    maxAge: 1000 * 60 * 60 * 24 * 7 * 4 // 4 weeks 
+        maxAge: 1000 * 60 * 60 * 24 * 7 * 4 // 4 weeks 
     },
     store: store
 }));
@@ -42,6 +43,7 @@ for (var i in routes) {
 }
 
 // session mgmt
+var User = require('./models/user.model');
 var store = new MongoDBStore({
     uri: mongooseUri,
     collection: 'usersessions'
@@ -61,18 +63,42 @@ function authMiddleware (req, res, next) {
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.post('/login', function(req, res) {
-    if (req.body.email && req.body.password && req.body.password === 'go') {
-        req.session.loggedIn = true;
-        req.session.user = req.body.email;
-        res.send(req.session);
+    var creds, result = { authenticated: false, error: null };
+    var isNew = !!req.body.new;
+    if (!req.body.email || !req.body.password) {
+        result.error = "Please provide both email and password";
+        res.json(result);
     } else {
-        req.session.loggedIn = false;
-        req.session.user = null;
-        res.send(req.session);
+        creds = {
+            email: req.body.email,
+            passwordHash: md5(req.body.password)
+        };
+        console.log('POST login',creds,isNew);
+        if (isNew) User.create(creds, finishLogin);
+        else User.authenticate(creds, finishLogin);
+    }
+
+    function finishLogin (err, user) {
+        console.log('finish login',err, user);
+        // debugger;
+        if (err) {
+            result.error = err;
+            res.json(result);
+        } else {
+            if (user) {
+                req.session.isLoggedIn = true;
+                req.session.user = creds.email;
+                result.authenticated = true;
+                res.json(result);
+            } else {
+                result.error = 'Your account could not be ' + (isNew ? 'created' : 'found');
+                res.json(result);
+            }
+        }
     }
 });
 app.get('/logout', function(req, res) {
-    req.session.loggedIn = false;
-    req.user = null;
+    req.session.isLoggedIn = false;
+    req.session.user = null;
     res.send(req.session);
 });

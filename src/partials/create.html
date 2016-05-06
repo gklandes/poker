@@ -1,0 +1,17 @@
+<div class="row" ng-switch="vm.step">
+    <form name="emailForm" class="col-xs-12 col-xs-offset-0 col-sm-6 col-sm-offset-3 col-md-4 col-sm-offset-4" ng-submit="vm.doLogin()" ng-switch-when="email">
+        <p class="text-right"><a ui-sref="create">Create an account</a></p>
+        <div class="form-group">
+            <label for="email">Email address</label>
+            <input ng-model="vm.login.email" type="email" class="form-control" id="email" placeholder="Email" required>
+        </div>
+        <input type="submit" class="btn btn-primary btn-block" ng-disabled="vm.loggingIn" value="{{ vm.loggingIn ? 'Sending...' : 'Login'}}">
+    </form>
+    <form name="passwordForm" class="col-xs-12 col-xs-offset-0 col-sm-6 col-sm-offset-3 col-md-4 col-sm-offset-4" ng-submit="vm.doLogin()" ng-switch-when="password">
+        <div class="form-group">
+            <label for="exampleInputPassword1">Password</label>
+            <input ng-model="vm.login.password" type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" required>
+        </div>
+        <input type="submit" class="btn btn-primary btn-block" ng-disabled="vm.loggingIn" value="{{ vm.loggingIn ? 'Sending...' : 'Login'}}">
+    </form>
+</div>

@@ -125,27 +125,29 @@
         var vm = this;
         var destination = '/' + $stateParams.path.replace(/^(login\/)+/,'');
         console.log('login dest',destination);
-        vm.login = {};
-        vm.doLogin = doLogin;
-        vm.loggingIn = false;
+        vm.creds = {};
+        vm.busy = false;
 
-        function doLogin () {
-            vm.loggingIn = true;
-            $http.post('/login',vm.login)
+        vm.login = login;
+
+        function login (newAcct) {
+            vm.busy = true;
+            if (newAcct) vm.creds.new = true;
+            $http.post('/login',vm.creds)
                 .success(function (success) {
-                    console.log('login data', success);
-                    if (success.loggedIn) $location.url(destination);
+                    if (success.authenticated) $location.url(destination);
                     else {
-                        vm.loggingIn = false;
-                        $scope.$emit('notify', 'Your credentials were not found. Try again!');
+                        vm.busy = false;
+                        $scope.$emit('notify', success.error);
                     }
                 })
-                .error(function (error) {
-                    vm.loggingIn = false;
-                    console.log('login error',error);
-                    $scope.$emit('notify', 'There was a problem processing your login. Try again!');
-                })
-            ;
+                .error(alertError);
+        }
+
+        function alertError (error) {
+            vm.busy = false;
+            console.log('login error',error);
+            $scope.$emit('notify', 'There was a problem processing your info. Try again!');
         }
     }
 
