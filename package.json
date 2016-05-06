@@ -8,7 +8,7 @@
     "test": "test"
   },
   "scripts": {
-    "start": "node scripts/server.js 8080"
+    "start": "node server.js 8080"
   },
   "author": "Gabriel Landes",
   "license": "ISC",
