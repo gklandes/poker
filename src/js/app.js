@@ -124,16 +124,15 @@
     function LoginCtrl ($scope, $http, $location, $state, $stateParams) {
         var vm = this;
         var destination = '/' + $stateParams.path.replace(/^(login\/)+/,'');
-        console.log('login dest',destination);
         vm.creds = {};
         vm.busy = false;
+        vm.mode = null;
 
-        vm.login = login;
+        vm.submitForm = submitForm;
 
-        function login (newAcct) {
+        function submitForm () {
             vm.busy = true;
-            if (newAcct) vm.creds.new = true;
-            $http.post('/login',vm.creds)
+            $http.post(vm.mode === 'login' ? '/login' : '/register',vm.creds)
                 .success(function (success) {
                     if (success.authenticated) $location.url(destination);
                     else {
@@ -144,17 +143,14 @@
                 .error(alertError);
         }
 
-        function alertError (error) {
+        function alertError () { //error
             vm.busy = false;
-            console.log('login error',error);
             $scope.$emit('notify', 'There was a problem processing your info. Try again!');
         }
     }
 
     LogoutCtrl.$inject = ['$scope', '$http', '$state'];
     function LogoutCtrl ($scope, $http, $state) {
-        var vm = this;
-
         doLogout();
 
         function doLogout () {

@@ -62,43 +62,71 @@ function authMiddleware (req, res, next) {
 }
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.post('/register', function (req, res) {
+    var creds = req.body;
+    var result = { authenticated: false, error: null };
+    if (!creds.name || !creds.email || !creds.password || !creds.confirm) {
+        result.error = "Please provide all required fields.";
+        res.json(result);
+    } else if (creds.password !== creds.confirm) {
+        result.error = "The password must match the confirm field.";
+        res.json(result);
+    } else {
+        creds.confirm = undefined;
+        User.create(creds, finishRegistration);
+    }
+    function finishRegistration (err, user) {
+        if (err) throw err;
+
+        console.log(user);
+        initSession(user, req);
+        result.authenticated = true;
+        res.json(result);
+    }
+});
 app.post('/login', function(req, res) {
-    var creds, result = { authenticated: false, error: null };
-    var isNew = !!req.body.new;
-    if (!req.body.email || !req.body.password) {
+    var creds = req.body;
+    var result = { authenticated: false, error: null };
+
+    if (!creds.email || !creds.password) {
         result.error = "Please provide both email and password";
         res.json(result);
     } else {
-        creds = {
-            email: req.body.email,
-            passwordHash: md5(req.body.password)
-        };
-        console.log('POST login',creds,isNew);
-        if (isNew) User.create(creds, finishLogin);
-        else User.authenticate(creds, finishLogin);
+        console.log('POST login',creds);
+        User.findOne({ email: creds.email },validate);
     }
 
-    function finishLogin (err, user) {
-        console.log('finish login',err, user);
-        // debugger;
-        if (err) {
-            result.error = err;
+    function validate (err, user) {
+        if (err) throw err;
+        if (!user) {
+            result.error = 'User not found';
             res.json(result);
         } else {
-            if (user) {
-                req.session.isLoggedIn = true;
-                req.session.user = creds.email;
-                result.authenticated = true;
-                res.json(result);
-            } else {
-                result.error = 'Your account could not be ' + (isNew ? 'created' : 'found');
-                res.json(result);
-            }
+            user.comparePassword(creds.password, function(err, isMatch) {
+                if (err) throw err;
+
+                if (isMatch) {
+                    initSession(user, req);
+                    result.authenticated = true;
+                    res.json(result);
+                }
+                else {
+                    result.error = 'The credentials could not be verified';
+                    res.json(result);
+                }
+            });
         }
     }
 });
+
+function initSession (user, req) {
+    console.log('initSession', user);
+    req.session.loggedIn = true;
+    req.session.user = user.email;
+}
+
 app.get('/logout', function(req, res) {
-    req.session.isLoggedIn = false;
+    req.session.loggedIn = false;
     req.session.user = null;
     res.send(req.session);
 });

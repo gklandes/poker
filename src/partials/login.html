@@ -1,6 +1,14 @@
 <div class="row">
     <div  class="col-xs-12 col-xs-offset-0 col-sm-6 col-sm-offset-3 col-md-4 col-sm-offset-4">
-        <form name="emailForm" ng-submit="vm.login()">
+        <div ng-if="!vm.mode">
+            <a href="" class="btn btn-primary btn-block" ng-click="vm.mode = 'login'">Login</a>
+            <a href="" class="btn btn-default btn-block" ng-click="vm.mode = 'register'">Register</a>
+        </div>
+        <form name="emailForm" ng-submit="vm.submitForm()" ng-if="vm.mode">
+            <div class="form-group" ng-if="vm.mode === 'register'">
+                <label for="email">Name</label>
+                <input ng-model="vm.creds.name" type="text" class="form-control" id="name" placeholder="name" required>
+            </div>
             <div class="form-group">
                 <label for="email">Email address</label>
                 <input ng-model="vm.creds.email" type="email" class="form-control" id="email" placeholder="Email" required>
@@ -9,8 +17,11 @@
                 <label for="password">Password</label>
                 <input ng-model="vm.creds.password" type="password" class="form-control" id="newPassword" placeholder="Password" required>
             </div>
-            <input type="submit" class="btn btn-primary btn-block" ng-disabled="vm.busy" value="{{ vm.busy ? 'Sending...' : 'Log in'}}">
-            <input type="button" class="btn btn-default btn-block" ng-disabled="vm.busy" value="{{ vm.busy ? 'Sending...' : 'Create account'}}" ng-click="vm.login(true)">
+            <div class="form-group" ng-if="vm.mode === 'register'">
+                <label for="confirm">Confirm</label>
+                <input ng-model="vm.creds.confirm" type="password" class="form-control" id="newConfirm" placeholder="Confirm" required>
+            </div>
+            <input type="submit" class="btn btn-primary btn-block" ng-disabled="vm.busy" value="{{ vm.busy ? 'Sending...' : 'Submit'}}">
         </form>
     </div>
 </div>
