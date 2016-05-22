@@ -9,6 +9,7 @@
         .controller('AppCtrl', AppCtrl)
         .controller('LoadingCtrl', LoadingCtrl)
         .controller('LoginCtrl', LoginCtrl)
+        .controller('ResetCtrl', ResetCtrl)
         .controller('LogoutCtrl', LogoutCtrl)
         .controller('HomeCtrl', HomeCtrl)
         .controller('GameCtrl', GameCtrl)
@@ -108,15 +109,17 @@
 
     LoadingCtrl.$inject = ['$scope', '$http', '$location', '$stateParams', 'UserSession'];
     function LoadingCtrl ($scope, $http, $location, $stateParams, UserSession) {
-        var destination = $stateParams.path;
+        var destination = $location.url().replace(/^(\/(loading|login))+/,'');
         console.log('UserSession',UserSession);
         
-        if (UserSession.loaded) verifySession();
-        else $scope.$on('sessioninit', verifySession);
+        if (UserSession.loaded) forwardToDestination();
+        else $scope.$on('sessioninit', forwardToDestination);
 
-        function verifySession () {
-            if (UserSession.loggedIn) $location.url(destination);
-            else $location.url('/login/' + destination);
+        function forwardToDestination () {
+            var publicRoots = ['reset'];
+            var destRoot = destination.slice(1).split(/[/?]/)[0];
+            if (publicRoots.indexOf(destRoot) >= 0 || UserSession.loggedIn) $location.url(destination);
+            else $location.url('/login' + destination);
         }
     }
 
@@ -130,23 +133,72 @@
 
         vm.submitForm = submitForm;
 
+        return;
+
         function submitForm () {
             vm.busy = true;
-            $http.post(vm.mode === 'login' ? '/login' : '/register',vm.creds)
-                .success(function (success) {
-                    if (success.authenticated) $location.url(destination);
-                    else {
+            if (vm.mode === 'recover') {
+                $http.post('/recover',vm.creds)
+                    .success(function (success){
+                        vm.mode = null;
                         vm.busy = false;
-                        $scope.$emit('notify', success.error);
-                    }
-                })
-                .error(alertError);
+                        $scope.$emit('notify','Your password recovery link has been sent.');
+                    })
+                    .error(alertError)
+                ;
+            } else {
+                $http.post(vm.mode === 'login' ? '/login' : '/register',vm.creds)
+                    .success(function (success) {
+                        if (success.authenticated) $location.url(destination);
+                        else {
+                            vm.mode = null;
+                            vm.busy = false;
+                            $scope.$emit('notify', success.error);
+                        }
+                    })
+                    .error(alertError)
+                ;
+            }
         }
-
-        function alertError () { //error
+        function alertError (error) {
             vm.busy = false;
             $scope.$emit('notify', 'There was a problem processing your info. Try again!');
+            console.log(error);
         }
+    }
+
+    ResetCtrl.$inject = ['$scope', '$http', '$state', '$location'];
+    function ResetCtrl ($scope, $http, $state, $location) {
+        console.log($state);
+        var vm = this;
+        vm.creds = {};
+
+        vm.doReset = doReset;
+
+        initialize();
+
+        return;
+
+        function initialize () {
+            vm.creds.key = $location.search().key;
+        }
+
+        function doReset () {
+            $http.post('/reset',vm.creds)
+                .success(function (success) {
+                    if (success.reset) {
+                        $scope.$emit('notify', 'Your password is reset.');
+                        $state.go('login');
+                    }
+                })
+                .error(function alertError (error) {
+                    vm.busy = false;
+                    $scope.$emit('notify', 'There was a problem processing your info. Try again!');
+                    console.log(error);
+                })
+            ;
+        }
+        
     }
 
     LogoutCtrl.$inject = ['$scope', '$http', '$state'];

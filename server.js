@@ -6,6 +6,7 @@ var requireDir = require("require-dir");
 var mongoose   = require('mongoose');
 var MongoDBStore = require('connect-mongodb-session')(session);
 var md5 = require('md5');
+var mailer = require('./mail');
 
 var mongooseUri = 'mongodb://localhost:27017/poker';
 mongoose.connect(mongooseUri); // connect to our database
@@ -82,6 +83,60 @@ app.post('/register', function (req, res) {
         initSession(user, req);
         result.authenticated = true;
         res.json(result);
+    }
+});
+app.post('/recover', function (req, res) {
+    var email = req.body.email;
+    var result = { reset: false, error: null };
+
+    User.findOne({ email: email }, setupRecovery);
+
+    function setupRecovery (err, user) {
+        if (err) throw err;
+        if (user) {
+            var d = new Date();
+            var key = md5(d.valueOf() + user.password);
+            user.reset = key;
+            user.save();
+
+            mailer.send({
+                to: user.email,
+                from: 'noreply@poker.com',
+                subj: 'Password Reset',
+                body: 'your reset key is '+key
+            });
+
+            result.reset = true;
+            res.json(result);
+        } else {
+            result.error = 'Your account could not be found.';
+            res.json(result);
+        }
+    }
+});
+app.post('/reset', function (req, res) {
+    var creds = req.body;
+    var result = { reset: false, error: null };
+
+    if (creds.password !== creds.confirm) {
+        result.error = "The password must match the confirm field.";
+        res.json(result);
+    }
+
+    User.findOne({ reset: creds.key }, updatePassword);
+
+    function updatePassword (err, user) {
+        if (err) throw err;
+        if (user) {
+            user.password = creds.password;
+            user.reset = null;
+            user.save();
+            result.reset = true;
+            res.json(result);
+        } else {
+            result.error = 'Your key is not valid.';
+            res.json(result);
+        }
     }
 });
 app.post('/login', function(req, res) {

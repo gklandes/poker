@@ -16,6 +16,12 @@
                 controller: 'LoginCtrl',
                 controllerAs: 'vm'
             });
+            $stateProvider.state('reset', {
+                url: '/reset',
+                templateUrl: '/partials/reset.html',
+                controller: 'ResetCtrl',
+                controllerAs: 'vm'
+            });
             $stateProvider.state('logout', {
                 url: '/logout',
                 template: '<div class="text-center text-muted"><i class="fa fa-spinner fa-spin"></i></div>',

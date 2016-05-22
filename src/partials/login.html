@@ -13,7 +13,7 @@
                 <label for="email">Email address</label>
                 <input ng-model="vm.creds.email" type="email" class="form-control" id="email" placeholder="Email" required>
             </div>
-            <div class="form-group">
+            <div class="form-group" ng-if="vm.mode !== 'recover'">
                 <label for="password">Password</label>
                 <input ng-model="vm.creds.password" type="password" class="form-control" id="newPassword" placeholder="Password" required>
             </div>
@@ -22,6 +22,16 @@
                 <input ng-model="vm.creds.confirm" type="password" class="form-control" id="newConfirm" placeholder="Confirm" required>
             </div>
             <input type="submit" class="btn btn-primary btn-block" ng-disabled="vm.busy" value="{{ vm.busy ? 'Sending...' : 'Submit'}}">
+            <p class="text-center">
+                <br>
+                <a href="" ng-click="vm.mode = null">cancel</a>
+                <span ng-if="vm.mode !== 'recover' && vm.mode !== 'register'"> |
+                    <a href="" ng-click="vm.mode = 'recover'">reset password</a>
+                </span>
+                <span ng-if="vm.mode === 'recover'"> |
+                    <a href="" ng-click="vm.mode = 'login'">login</a>
+                </span>
+            </p>
         </form>
     </div>
 </div>
